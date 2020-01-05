@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Header from './Components/Header'
+import Header from './components/Header'
 import './App.css';
-import Parts from './Components/Parts';
-import Total from './Components/Total'
+import Parts from './components/Parts';
+import Total from './components/Total'
 
 class App extends Component {
   constructor(props){
@@ -70,8 +70,8 @@ class App extends Component {
       }  
     }
   }
-
-//this will be used with other files
+  
+  //this will be used with other files
   updateFeature(feature, newValue) {
     const selected = Object.assign({}, this.state.selected);
     selected[feature] = newValue;
@@ -79,17 +79,18 @@ class App extends Component {
       selected
     });
   }
-
+  
+  
   render() {
     return (
       <div className="App">
         <Header />   
         <main>
-        
           
-        <Parts updateFeature={((feature, newValue) =>  this.updateFeature(feature, newValue))} selected={this.state.selected} features={this.state.features}/>
-
-         <Total selected={this.state.selected}/>
+          
+          <Parts updateFeature={((feature, newValue) =>  this.updateFeature(feature, newValue))} selected={this.state.selected} features={this.state.features}/>
+          
+          <Total selected={this.state.selected}/>
         </main>
         
       </div>
