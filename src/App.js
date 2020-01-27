@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Header from './components/Header'
 import './App.css';
-import Parts from './components/Parts';
-import Total from './components/Total'
+import Title from './title-component/Title';
+import Options from './options-component/Options';
+import Summary from './summary-component/Summary';
 
 class App extends Component {
   constructor(props){
@@ -25,72 +25,88 @@ class App extends Component {
             name: '15.6" UHD (3840 x 2160) 60Hz Bright Lights and Knobs',
             cost: 1500
           }
-      },
-      features: {
-        Processor: [
-          {
-            name: '17th Generation Intel Core HB (7 Core with donut spare)',
-            cost: 700
-          },
-          {
-            name: 'Professor X AMD Fire Breather with sidewinder technology',
-            cost: 1200
-          }
-        ],
-        "Operating System": [
-          {
-            name: 'Ubuntu Linux 16.04',
-            cost: 200
-          },
-          {
-            name: 'Bodhi Linux',
-            cost: 300
-          }
-        ],
-        "Video Card": [
-          {
-            name: 'Toyota Corolla 1.5v',
-            cost: 1150.98
-          },
-          {
-            name: 'Mind mild breeze 2000',
-            cost: 1345
-          }
-        ],
-        Display: [
-          {
-            name: '15.6" UHD (3840 x 2160) 60Hz Bright Lights and Knobs',
-            cost: 1500
-          },
-          {
-            name: '15.3" HGTV (3840 x 2160) Home makeover edition',
-            cost: 1400
-          },
-        ]
-      }  
+      }
     }
   }
-  
-  //this will be used with other files
-  updateFeature(feature, newValue) {
-    const selected = Object.assign({}, this.state.selected);
-    selected[feature] = newValue;
+
+  updateFeature(itemsSelected, newValue) {
+    
+    console.log(`updating features`)
+    const selected = Object.assign({}, itemsSelected);
+    selected[itemsSelected] = newValue;
     this.setState({
       selected
     });
   }
-  
-  
+
+  updateSummary = (selectedItems) =>{
+    console.log(`updating summary`)
+    Object.keys(selectedItems).map(key=>
+      <div className="summary__option" key= {key}>
+        <div className="summary__option__label"> {key}  </div>
+        <div className="summary__option__value"> {selectedItems[key].name} </div>
+        <div className="summary__option__cost">
+          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD'})
+                      .format(selectedItems[key].cost) }
+        </div>
+      </div>)
+  }
+
+  updateTotal = (selectedItems) =>{
+    console.log(`updating total`)
+    if(!selectedItems){
+      selectedItems=this.state.selected
+    }
+    Object.keys(selectedItems)
+          .reduce((acc, curr) => acc + selectedItems[curr].cost, 0); 
+  }
+
+  updateSelectedFeatures = (features, itemsSelected) =>{
+    console.log(`updating selected features`)
+
+    Object.keys(features)
+          .map(key => {
+            const options = features[key].map((item, index) => {
+              const selectedClass = item.name === itemsSelected[key].name ? 'feature__selected' : '';
+              const featureClass = 'feature__option ' + selectedClass;
+              return <li key= {index} className="feature__item">
+                <div className={featureClass}
+                  
+                  onClick={e => this.props.handleUpdateSummary(key, item)}>
+                    { item.name }
+                    ({ new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD'})
+                      .format(item.cost) })
+                </div>
+              </li>
+            });
+
+            return <div className="feature" key={key}>
+              <div className="feature__name">{key}</div>
+              <ul className="feature__list">
+                { options }
+              </ul>
+            </div>
+          });
+  }
+
+
   render() {
+    
     return (
+      // title component
       <div className="App">
-        <Header />   
+        <Title />
         <main>
-          
-          
-          <Parts updateFeature={((feature, newValue) =>  this.updateFeature(feature, newValue))} selected={this.state.selected} features={this.state.features}/>
-          
-          <Total selected={this.state.selected}/>
+        <Options 
+          itemsSelected = {this.state.selected}
+          features = {this.props.features}
+          handleUpdateSelectedFeatures = { (features, itemsSelected)=>this.updateSelectedFeatures(this.props.features, this.state.selected)}
+          handleUpdateSummary ={(itemsSelected)=> this.updateFeature(itemsSelected)}
+        />
+        <Summary
+         itemsSelected = {this.state.selected}
+         features = {this.props.features}
+        />
         </main>
         
       </div>
